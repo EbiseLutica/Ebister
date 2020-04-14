@@ -199,7 +199,7 @@ func deg2rad(val) {
 printLine("Hello, world!")
 
 // 式として関数を使う
-printLine(Math.sin(45 / 180 * Math.pi));
+printLine(Math.sin(45 / 180 * Math.pi))
 ```
 
 #### 出力
@@ -238,7 +238,7 @@ printLine(hello("Citrine")) // Hello, Citrine!
 
 ```js
 (() => {
-    print("Hello, functional world!"); // Hello, functional world!
+    print("Hello, functional world!") // Hello, functional world!
 })()
 ```
 
