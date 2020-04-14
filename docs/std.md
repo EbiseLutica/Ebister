@@ -45,16 +45,18 @@
 - `"boolean"`
 - `"array"`
 - `"function"`
+- `"object"`
 - `"null"`
 
 ### toNumber(value)
 `value` を数値に変換します。変換できる型は以下の通りです
 
 - 文字列型
-    - CitrineScript で取り扱う数値として正しく解釈できる文字列でない場合、0を返します
+    - CitrineScript で取り扱う数値として正しく解釈できる文字列でない場合、NaNを返します
 - boolean 型
     - true → 1, false → 0
 - null → 0
+- その他 → NaN
 
 ### toString(value)
 `value` を文字列に変換します。
@@ -246,3 +248,14 @@ callbackは値を引数に取り、真偽値を返す関数です。
 配列 arr の各要素について順番に callback を呼び出し、callback が一つでも true を返せば true, 一つも返さなければ false を返します。
 callbackは値を引数に取り、真偽値を返す関数です。
 
+## JSON グループ
+
+JSON グループは JSON との相互運用をサポートします。
+
+### stringify(obj, pretty?)
+
+オブジェクトをJSON文字列に変換し、文字列形式で返します。pretty = true の場合、綺麗に整形します。
+
+### parse(str)
+
+JSON 文字列をオブジェクトにパースし返します。正しいJSON文字列でなければエラーとなります。
