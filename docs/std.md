@@ -248,6 +248,9 @@ callbackは値を引数に取り、真偽値を返す関数です。
 配列 arr の各要素について順番に callback を呼び出し、callback が一つでも true を返せば true, 一つも返さなければ false を返します。
 callbackは値を引数に取り、真偽値を返す関数です。
 
+### distinct(arr)
+配列 arr の重複する要素を取り除いた物を返します。
+
 ## JSON グループ
 
 JSON グループは JSON との相互運用をサポートします。
