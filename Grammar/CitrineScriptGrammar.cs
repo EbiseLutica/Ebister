@@ -9,6 +9,7 @@ namespace Citrine.Scripting
 	{
 		public CitrineScriptGrammar()
 		{
+			// Terminals
 			var keyTrue = ToTerm("true", "true");
 			var keyFalse = ToTerm("false", "false");
 
@@ -38,7 +39,7 @@ namespace Citrine.Scripting
 			var keyLesserThan = ToTerm("<", "lesser_than");
 			var keyLesserEqual = ToTerm("<=", "lesser_equal");
 
-			var keyEqualEqual = ToTerm("==", "equal_equal");
+			var keyEqual2 = ToTerm("==", "equal_equal");
 			var keyNotEqual = ToTerm("!=", "not_equal");
 
 			var keyAllowRight = ToTerm("->", "allow_right");
@@ -58,11 +59,16 @@ namespace Citrine.Scripting
 			var keyQuestion = ToTerm("?", "question");
 			var keyBang = ToTerm("!", "bang");
 
+			var keyPlus2 = ToTerm("+", "plus2");
+			var keyMinus2 = ToTerm("-", "minus2");
+
 			var keyAmpersand = ToTerm("&", "ampersand");
 			var keyPipe = ToTerm("|", "pipe");
 
 			var keyAmpersand2 = ToTerm("&&", "ampersand2");
 			var keyPipe2 = ToTerm("||", "pipe2");
+
+			var keyHat = ToTerm("^", "hat");
 
 			var keyParenLeft = ToTerm("(", "paren_left");
 			var keyParenRight = ToTerm(")", "paren_right");
@@ -83,7 +89,7 @@ namespace Citrine.Scripting
 			NonGrammarTerminals.Add(singleComment);
 			NonGrammarTerminals.Add(multilineComment);
 
-			var num = new NumberLiteral("number",
+			var numberLiteral = new NumberLiteral("number",
 				NumberOptions.AllowSign |
 				NumberOptions.AllowStartEndDot |
 				NumberOptions.AllowUnderscore |
@@ -91,11 +97,87 @@ namespace Citrine.Scripting
 				NumberOptions.Hex
 			);
 
-			var str = new StringLiteral("string", "\"", StringOptions.AllowsAllEscapes);
-			str.AddPrefix("@", StringOptions.NoEscapes | StringOptions.AllowsLineBreak | StringOptions.AllowsDoubledQuote);
+			var stringLiteral = new StringLiteral("string", "\"", StringOptions.AllowsAllEscapes);
+			stringLiteral.AddPrefix("@", StringOptions.NoEscapes | StringOptions.AllowsLineBreak | StringOptions.AllowsDoubledQuote);
 
 			var identifier = new IdentifierTerminal("identifier");
 
+			// Non Terminals
+			var statements = new NonTerminal("statements");
+			var statement = new NonTerminal("statement");
+			var block = new NonTerminal("block");
+			var expression = new NonTerminal("expression");
+
+			var exprAndOr = new NonTerminal("exprAndOr");
+			var exprComparision = new NonTerminal("exprComparision");
+			var exprBit = new NonTerminal("exprBit");
+			var exprAddSub = new NonTerminal("exprAddSub");
+			var exprMulDiv = new NonTerminal("exprMulDiv");
+			var exprParen = new NonTerminal("exprParen");
+			var exprUnary = new NonTerminal("exprUnary");
+			var exprPreIncDec = new NonTerminal("exprPreIncDec");
+			var exprPostIncDec = new NonTerminal("exprPostIncDec");
+			var exprValue = new NonTerminal("exprValue");
+			var exprAssignImmutable = new NonTerminal("exprAssignImmutable");
+			var exprAssignMutable = new NonTerminal("exprAssignMutable");
+
+			var parameters = new NonTerminal("parameters");
+
+			statements.Rule = MakeStarRule(statements, statement);
+			statement.Rule =
+				expression + keySemicoron |
+				block;
+			block.Rule = keyCurlyBracketLeft + statements + keyCurlyBracketRight;
+
+			expression.Rule = exprAndOr;
+
+			exprAndOr.Rule = exprComparision |
+				exprAndOr + keyAmpersand2 + exprAndOr |
+				exprAndOr + keyPipe2 + exprAndOr;
+
+			exprComparision.Rule = exprBit |
+				exprComparision + keyEqual2 + exprComparision |
+				exprComparision + keyNotEqual + exprComparision |
+				exprComparision + keyLesserThan + exprComparision |
+				exprComparision + keyGreaterThan + exprComparision |
+				exprComparision + keyLesserEqual + exprComparision |
+				exprComparision + keyGreaterEqual + exprComparision;
+
+			exprBit.Rule = exprAddSub |
+				exprBit + keyAmpersand + exprBit |
+				exprBit + keyPipe + exprBit |
+				exprBit + keyHat + exprBit;
+
+			exprAddSub.Rule = exprMulDiv |
+				exprAddSub + keyPlus + exprAddSub |
+				exprAddSub + keyMinus + exprAddSub;
+
+			exprMulDiv.Rule = exprParen |
+				exprMulDiv + keyAsterisk + exprMulDiv |
+				exprMulDiv + keySlash + exprMulDiv |
+				exprMulDiv + keyPercent + exprMulDiv;
+
+			exprParen.Rule = exprUnary |
+				keyParenLeft + expression + keyParenRight;
+
+			exprUnary.Rule = exprPreIncDec |
+				keyPlus + exprUnary |
+				keyMinus + exprUnary;
+
+			exprPreIncDec.Rule = exprPostIncDec |
+				keyPlus2 + identifier |
+				keyMinus2 + identifier;
+
+			exprPostIncDec.Rule = exprValue |
+				identifier + keyPlus2 |
+				identifier + keyMinus2;
+
+			exprValue.Rule = stringLiteral | numberLiteral | keyTrue | keyFalse | keyNull | identifier;
+
+			parameters.Rule = MakeStarRule(parameters, keyComma, expression);
+
+
+			Root = statements;
 		}
 	}
 }
