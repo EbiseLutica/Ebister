@@ -20,7 +20,7 @@ CitrineScript の構文ドキュメント。
 
 - 変数, 関数, 定数, グループの定義
 - 制御構文
-- 関数呼び出し
+- 式
 - ブロック
 
 ステートメントは、ブロックを除き末尾に ; を付けなければならない。
@@ -79,7 +79,7 @@ CitrineScript では全ての数値は実数である。
 型をごちゃまぜにすることもできるため、容易にジャグ配列を作成できる。
 
 ```cs
-score := [ 1, 1, 4, 5, 1, 4 ];
+const score = [ 1, 1, 4, 5, 1, 4 ];
 
 print(score[3]); // 5
 score[0] = 5;
@@ -93,15 +93,14 @@ print(score); // [ 5, 1, 4, 5, 1, 4 ]
 値には文字列や数値はもちろん、配列、オブジェクト自身、さらには関数オブジェクトも格納できる。
 
 ```cs
-xeltica := {
-    // 変更不可能
-    name := "Xeltica",
-    age = 21,
+const xeltica = {
+    name: "Xeltica",
+    age: 21,
 };
 
 print(xeltica.name); // Xeltica
 xeltica.age += 79;
-print(xeltica); // { name := "Xeltica", age = 100 }
+print(xeltica); // { name: "Xeltica", age: 100 }
 ```
 
 標準ライブラリの `JSON` グループによってパースしたりシリアライズしたりできる。
@@ -109,17 +108,6 @@ print(xeltica); // { name := "Xeltica", age = 100 }
 ### 範囲リテラル
 
 範囲リテラルは、整数による範囲を表すものである。1から100の間、1つ飛ばし(1, 3, 5, 7, ...)を表現する場合は `1 -> 100 @ 2` と表記する。連番の場合 `@ 1` と書かなくても良い。
-
-範囲リテラルは、実際には次のようなオブジェクトに展開される。
-
-```cs
-// 1 -> 100 @ 2
-{
-    from: 1,
-    to: 100,
-    step: 2
-}
-```
 
 ## 演算
 
@@ -141,18 +129,22 @@ print(xeltica); // { name := "Xeltica", age = 100 }
 変数は型制約がなく、どんな値を入れることもできる。また、変数の宣言は代入も兼ねる。
 変数定義はステートメントであるが、式でもある。
 
-`<変数名> = <式>;`
+`var <変数名> = <式>;`
 
-`=` の代わりに `:=` を用いることで、定数を作成できる。変数は後で値を変更できる(mutable)であるが、定数は値を変更できない(inmutable)、つまり読み取り専用である。
+`var` の代わりに `const` を用いることで、定数を作成できる。変数は後で値を変更できる(mutable)であるが、定数は値を変更できない(inmutable)、つまり読み取り専用である。
 
 定数は値を変更できないだけでほかは変数と全く同じように使用できる。
 
-変数名・定数名は式として使える。
+`var` で定義した変数に再度値を代入する場合は、`var` を付けずに次のようにする。
+
+`<変数名> = <式>;`
+
+変数名・定数名は式に用いることで中身を表す。
 
 ```cs
 // := とすることで値を変更できなくする
-name := "Xeltica";
-age = 21;
+const name = "Xeltica";
+var age = 21;
 
 print("私の名前は");
 print(name);
@@ -175,11 +167,11 @@ printLine("歳です。");
 ローカル変数はそのブロックの終わりに破棄され、ブロックの外からは使うことができない。
 
 ```cs
-text = "おはよう";
+const text = "おはよう";
 
 {
     printLine(text); // "おはよう"
-    o = "world";
+    const o = "world";
     printLine("hello, " + o); // "hello, world"
 }
 printLine(text); // "おはよう"
@@ -239,7 +231,7 @@ Hello, world!
 func hello() { printLine("Hello"); }
 p(hello) // [Function hello]
 
-p := printLine;
+const p = printLine;
 p("Hello"); // Hello
 
 p(p); // [NativeFunction printLine]
@@ -252,7 +244,7 @@ p(p); // [NativeFunction printLine]
 次に示すように、ラムダ式と呼ばれる式を用いて定義する。
 
 ```cs
-hello := (name) => "Hello, " + name + "!";
+const hello = (name) => "Hello, " + name + "!";
 
 printLine(hello("Citrine")); // Hello, Citrine!
 ```
@@ -278,10 +270,10 @@ printLine(hello("Citrine")); // Hello, Citrine!
 ```cs
 group Citrine {
     // 変更できない
-    name := "Citrine";
+    const name = "Citrine";
 
     // 変更できる
-    age = 20;
+    var age = 20;
 
     func isKawaii(target) {
         return target == name;
@@ -312,7 +304,7 @@ if ステートメントは条件分岐を行うステートメントである�
 `if (<式>) <ステートメント>`
 
 ```cs
-a = inputNumber("数値を入れてね> ");
+const a = inputNumber("数値を入れてね> ");
 if (a > 5) {
     printLine("その数値は5より大きいね");
 }
@@ -327,7 +319,7 @@ else キーワードを使うと条件を満たさない場合の処理を書け
 `if (<式>) <ステートメント> else <ステートメント>`
 
 ```cs
-a = inputNumber("数値を入れてね> ");
+const a = inputNumber("数値を入れてね> ");
 if (a > 5) {
     printLine("その数値は5より大きいね");
 } else if (a < 5) {
@@ -370,6 +362,42 @@ for (i in 0 -> 10 @ 2) {
 6
 8
 
+```
+
+#### while
+
+条件を満たす間、ループする
+
+```js
+const a = 0;
+while (a < 5) {
+    printLine(a);
+    a++;
+}
+```
+
+#### do~while
+
+条件を満たす間、ループする。whileとは異なり、ブロックを実行した後に条件判断を行う（後判定）
+
+```js
+const a = 0;
+do {
+    printLine(a);
+    a++;
+} while (a < 5);
+```
+
+#### repeat
+
+無限ループする。終了時には明示的に `break;` を用いる必要がある。
+
+```js
+repeat {
+    const text = inputLine();
+    if (text == ".exit") break;
+    printLine(text);
+}
 ```
 
 ## イテレーター

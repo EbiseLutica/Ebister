@@ -4,86 +4,11 @@ using Irony.Parsing;
 
 namespace Citrine.Scripting
 {
-	[Language("CitrineScript", "1.0", "Citrine Script")]
+	[Language("CitrineScript", "1.0", "CitrineScript")]
 	public class CitrineScriptGrammar : Grammar
 	{
 		public CitrineScriptGrammar()
 		{
-			// Terminals
-			var keyTrue = ToTerm("true", "true");
-			var keyFalse = ToTerm("false", "false");
-
-			var keyIf = ToTerm("if", "if");
-			var keyElse = ToTerm("else", "else");
-			var keyFunc = ToTerm("func", "func");
-			var keyGroup = ToTerm("group", "group");
-			var keyReturn = ToTerm("return", "return");
-			var keyFor = ToTerm("for", "for");
-			var keyWhile = ToTerm("while", "while");
-			var keyRepeat = ToTerm("repeat", "repeat");
-			var keySwitch = ToTerm("switch", "switch");
-
-			var keyNull = ToTerm("null", "null");
-
-			var keyPlus = ToTerm("+", "plus");
-			var keyMinus = ToTerm("-", "minus");
-			var keyAsterisk = ToTerm("*", "asterisk");
-			var keySlash = ToTerm("/", "slash");
-			var keyPercent = ToTerm("%", "percent");
-
-			var keyShiftLeft = ToTerm("<<", "shift_left");
-			var keyShiftRight = ToTerm(">>", "shift_right");
-
-			var keyGreaterThan = ToTerm(">", "greater_than");
-			var keyGreaterEqual = ToTerm(">=", "greater_equal");
-			var keyLesserThan = ToTerm("<", "lesser_than");
-			var keyLesserEqual = ToTerm("<=", "lesser_equal");
-
-			var keyEqual2 = ToTerm("==", "equal_equal");
-			var keyNotEqual = ToTerm("!=", "not_equal");
-
-			var keyAllowRight = ToTerm("->", "allow_right");
-			var keyAtmark = ToTerm("@", "atmark");
-
-
-			var keyEqual = ToTerm("=", "equal");
-			var keyCoronEqual = ToTerm(":=", "coron_equal");
-			var keyPlusEqual = ToTerm("+=", "coron_equal");
-			var keyMinusEqual = ToTerm("-=", "coron_equal");
-			var keyAsteriskEqual = ToTerm("*=", "coron_equal");
-			var keySlashEqual = ToTerm("/=", "coron_equal");
-			var keyPercentEqual = ToTerm("%=", "coron_equal");
-			var keyShiftLeftEqual = ToTerm("<<=", "coron_equal");
-			var keyShiftRightEqual = ToTerm(">>=", "coron_equal");
-
-			var keyQuestion = ToTerm("?", "question");
-			var keyBang = ToTerm("!", "bang");
-
-			var keyPlus2 = ToTerm("+", "plus2");
-			var keyMinus2 = ToTerm("-", "minus2");
-
-			var keyAmpersand = ToTerm("&", "ampersand");
-			var keyPipe = ToTerm("|", "pipe");
-
-			var keyAmpersand2 = ToTerm("&&", "ampersand2");
-			var keyPipe2 = ToTerm("||", "pipe2");
-
-			var keyHat = ToTerm("^", "hat");
-
-			var keyParenLeft = ToTerm("(", "paren_left");
-			var keyParenRight = ToTerm(")", "paren_right");
-
-			var keySquareBracketLeft = ToTerm("[", "square_bracket_left");
-			var keySquareBracketRight = ToTerm("]", "square_bracket_right");
-
-			var keyCurlyBracketLeft = ToTerm("{", "curly_bracket_left");
-			var keyCurlyBracketRight = ToTerm("}", "curly_bracket_right");
-
-			var keyDot = ToTerm(".", "dot");
-			var keyComma = ToTerm(",", "comma");
-			var keySemicoron = ToTerm(";", "semicoron");
-			var keyCoron = ToTerm(":", "coron");
-
 			var singleComment = new CommentTerminal("single_comment", "//", "\r", "\n", "\u2085", "\u2028", "\u2029");
 			var multilineComment = new CommentTerminal("multiline_comment", "/*", "*/");
 			NonGrammarTerminals.Add(singleComment);
@@ -102,82 +27,247 @@ namespace Citrine.Scripting
 
 			var identifier = new IdentifierTerminal("identifier");
 
-			// Non Terminals
 			var statements = new NonTerminal("statements");
+			var statementCanBeChild = new NonTerminal("statementCanBeChild");
 			var statement = new NonTerminal("statement");
 			var block = new NonTerminal("block");
 			var expression = new NonTerminal("expression");
 
-			var exprAndOr = new NonTerminal("exprAndOr");
+			var option = new NonTerminal("option");
+			var options = new NonTerminal("options");
+
+			var statementVar = new NonTerminal("statementVar");
+			var statementConst = new NonTerminal("statementConst");
+			var statementIf = new NonTerminal("statementIf");
+			var statementFor = new NonTerminal("statementFor");
+			var statementWhile = new NonTerminal("statementWhile");
+			var statementDoWhile = new NonTerminal("statementDoWhile");
+			var statementRepeat = new NonTerminal("statementRepeat");
+			var statementGroup = new NonTerminal("statementGroup");
+			var statementFunc = new NonTerminal("statementFunc");
+			var statementReturn = new NonTerminal("statementReturn");
+			var statementBreak = new NonTerminal("statementBreak");
+			var statementContinue = new NonTerminal("statementContinue");
+
+			var groupChildren = new NonTerminal("groupChildren");
+
+			var exprAssignment = new NonTerminal("exprAssignment");
+			var exprCondition = new NonTerminal("exprLambda");
+			var exprOr2 = new NonTerminal("exprOr");
+			var exprAnd2 = new NonTerminal("exprAnd");
+			var exprXor = new NonTerminal("exprAnd");
+			var exprOr = new NonTerminal("exprAnd");
+			var exprAnd = new NonTerminal("exprAnd");
 			var exprComparision = new NonTerminal("exprComparision");
-			var exprBit = new NonTerminal("exprBit");
+			var exprShift = new NonTerminal("exprShift");
 			var exprAddSub = new NonTerminal("exprAddSub");
 			var exprMulDiv = new NonTerminal("exprMulDiv");
+			var exprRange = new NonTerminal("exprRange");
+			var exprPreUnary = new NonTerminal("exprUnary");
+			var exprPostUnary = new NonTerminal("exprPreIncDec");
 			var exprParen = new NonTerminal("exprParen");
-			var exprUnary = new NonTerminal("exprUnary");
-			var exprPreIncDec = new NonTerminal("exprPreIncDec");
-			var exprPostIncDec = new NonTerminal("exprPostIncDec");
-			var exprValue = new NonTerminal("exprValue");
-			var exprAssignImmutable = new NonTerminal("exprAssignImmutable");
-			var exprAssignMutable = new NonTerminal("exprAssignMutable");
+			var exprLambda = new NonTerminal("exprLambda");
 
 			var parameters = new NonTerminal("parameters");
+			var identifiers = new NonTerminal("identifiers");
+			var keyValuePairs = new NonTerminal("keyValuePairs");
+			var keyValuePair = new NonTerminal("keyValuePair");
+			var @object = new NonTerminal("object");
+			var array = new NonTerminal("array");
 
-			statements.Rule = MakeStarRule(statements, statement);
-			statement.Rule =
-				expression + keySemicoron |
+
+			keyValuePair.Rule =
+				(identifier | stringLiteral) + ":" + expression;
+
+			keyValuePairs.Rule =
+				MakeStarRule(keyValuePairs, ToTerm(","), keyValuePair);
+
+			parameters.Rule =
+				MakeStarRule(parameters, ToTerm(","), expression);
+
+			identifiers.Rule =
+				MakeStarRule(identifiers, ToTerm(","), identifier);
+
+			@object.Rule =
+				"{" + keyValuePairs + "}";
+
+			array.Rule =
+				"[" + parameters + "]";
+
+			statementCanBeChild.Rule =
+				statementIf |
+				statementFor |
+				statementWhile |
+				statementDoWhile |
+				statementRepeat |
+				statementReturn |
+				statementBreak |
+				statementContinue |
+				expression + ";" |
+				";" |
 				block;
-			block.Rule = keyCurlyBracketLeft + statements + keyCurlyBracketRight;
 
-			expression.Rule = exprAndOr;
+			statement.Rule =
+				statementCanBeChild |
+				statementVar |
+				statementConst |
+				statementGroup |
+				statementFunc;
 
-			exprAndOr.Rule = exprComparision |
-				exprAndOr + keyAmpersand2 + exprAndOr |
-				exprAndOr + keyPipe2 + exprAndOr;
+			statements.Rule =
+				MakeStarRule(statements, statement);
 
-			exprComparision.Rule = exprBit |
-				exprComparision + keyEqual2 + exprComparision |
-				exprComparision + keyNotEqual + exprComparision |
-				exprComparision + keyLesserThan + exprComparision |
-				exprComparision + keyGreaterThan + exprComparision |
-				exprComparision + keyLesserEqual + exprComparision |
-				exprComparision + keyGreaterEqual + exprComparision;
+			block.Rule =
+				"{" + statements + "}";
 
-			exprBit.Rule = exprAddSub |
-				exprBit + keyAmpersand + exprBit |
-				exprBit + keyPipe + exprBit |
-				exprBit + keyHat + exprBit;
+			expression.Rule =
+				exprParen |
+				exprAssignment |
+				numberLiteral |
+				stringLiteral |
+				@object |
+				array |
+				"null" | "true" | "false";
+
+			exprParen.Rule =
+				// (expr)
+				"(" + expression + ")";
+
+			exprLambda.Rule =
+				// (params) => <expr | block>;
+				(("(" + identifiers + ")") | identifier) + "=>" + (expression | block);
+
+			exprAssignment.Rule = exprCondition |
+				exprLambda |
+				// x = y  x += y  x -= y  x *= y  x /= y  x %= y  x &= y  x |= y  x ^= y  x <<= y  x >>= y
+				expression + (ToTerm("=") | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=") + expression;
+
+			exprCondition.Rule = exprOr2 |
+				// c ? t : f
+				expression + "?" + expression + ":" + expression;
+
+			exprOr2.Rule = exprAnd2 |
+				// x || y
+				expression + "||" + expression;
+
+			exprAnd2.Rule = exprXor |
+				// x && y
+				expression + "&&" + expression;
+
+			exprXor.Rule = exprOr |
+				// x ^ y
+				expression + "^" + expression;
+
+			exprOr.Rule = exprAnd |
+				// x | y
+				expression + "|" + expression;
+
+			exprAnd.Rule = exprComparision |
+				// x & y
+				expression + "&" + expression;
+
+			exprComparision.Rule = exprShift |
+				// x == y  x != y  x <= y  x >= y  x < y  x > y
+				expression + (ToTerm("==") | "!=" | "<=" | ">=" | "<" | ">") + expression;
+
+			exprShift.Rule = exprAddSub |
+				// x << y  x >> y
+				expression + (ToTerm("<<") | ">>") + expression;
 
 			exprAddSub.Rule = exprMulDiv |
-				exprAddSub + keyPlus + exprAddSub |
-				exprAddSub + keyMinus + exprAddSub;
+				// x + y  x - y
+				expression + (ToTerm("+") | "-") + expression;
 
-			exprMulDiv.Rule = exprParen |
-				exprMulDiv + keyAsterisk + exprMulDiv |
-				exprMulDiv + keySlash + exprMulDiv |
-				exprMulDiv + keyPercent + exprMulDiv;
+			exprMulDiv.Rule = exprRange |
+				// x * y  x / y  x % y
+				expression + (ToTerm("*") | "/" | "%") + expression;
 
-			exprParen.Rule = exprUnary |
-				keyParenLeft + expression + keyParenRight;
+			exprRange.Rule = exprPreUnary |
+				// f -> t
+				numberLiteral + "->" + numberLiteral |
+				// f -> t @ s
+				numberLiteral + "->" + numberLiteral + "@" + numberLiteral;
 
-			exprUnary.Rule = exprPreIncDec |
-				keyPlus + exprUnary |
-				keyMinus + exprUnary;
+			exprPreUnary.Rule = exprPostUnary |
+				// ++x --x +x -x !x
+				(ToTerm("++") | "--" | "+" | "-" | "!") + expression;
 
-			exprPreIncDec.Rule = exprPostIncDec |
-				keyPlus2 + identifier |
-				keyMinus2 + identifier;
+			exprPostUnary.Rule =
+				// x++ x--
+				expression + (ToTerm("++") | ToTerm("--")) |
+				// x.y
+				expression + "." + identifier |
+				// x[y]
+				expression + "[" + expression + "]" |
+				// f(x)
+				expression + "(" + parameters + ")";
 
-			exprPostIncDec.Rule = exprValue |
-				identifier + keyPlus2 |
-				identifier + keyMinus2;
+			option.Rule =
+				ToTerm("option") + "strict" + ";";
 
-			exprValue.Rule = stringLiteral | numberLiteral | keyTrue | keyFalse | keyNull | identifier;
+			options.Rule =
+				MakeStarRule(options, option);
 
-			parameters.Rule = MakeStarRule(parameters, keyComma, expression);
+			statementVar.Rule =
+				// const id = expr;
+				"var" + identifier + "=" + expression + ";";
 
+			statementConst.Rule =
+				// const id = expr;
+				"const" + identifier + "=" + expression + ";";
 
-			Root = statements;
+			statementIf.Rule =
+				// if (expr) statement
+				"if" + "(" + expression + ")" + statementCanBeChild |
+				// if (expr) statement else statement
+				"if" + "(" + expression + ")" + statementCanBeChild + "else" + statementCanBeChild;
+
+			statementFor.Rule =
+				// for (id in expr) statement
+				"for" + "(" + identifier + "in" + expression + ")" + statementCanBeChild;
+
+			statementWhile.Rule =
+				// while (expr) statement
+				"while" + "(" + expression + ")" + statementCanBeChild;
+
+			statementDoWhile.Rule =
+				// do statement while (expr);
+				"do" + statementCanBeChild + "while" + "(" + expression + ")" + ";";
+
+			statementRepeat.Rule =
+				// repeat statement
+				"repeat" + statementCanBeChild;
+
+			statementGroup.Rule =
+				// group { groupChildren } }
+				"group" + "{" + groupChildren + "}";
+
+			groupChildren.Rule =
+				MakeStarRule(groupChildren,
+					statementVar | statementConst | statementFunc
+				);
+
+			statementFunc.Rule =
+				// func id(identifiers) { statements }
+				"func" + identifier + "(" + identifiers + ")" + block;
+
+			statementReturn.Rule =
+				// return;  return expr;
+				ToTerm("return") + ";" |
+				"return" + expression + ";";
+
+			statementBreak.Rule =
+				// break;
+				ToTerm("break") + ";";
+
+			statementContinue.Rule =
+				// break;
+				ToTerm("continue") + ";";
+
+			Root = new NonTerminal("program")
+			{
+				Rule = options + statements
+			};
 		}
 	}
 }
