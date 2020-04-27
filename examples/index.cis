@@ -1,0 +1,32 @@
+// CitrineScript sample code
+
+group Math {
+    func lerp(time, start, end) {
+        return start + (end - start) * time;
+    }
+}
+
+const mode = inputLine(
+@"モードを選択してください
+1:線形補間
+2:オウム返し
+3:10数える
+");
+
+if (mode == "1") {
+    for (i in 0 -> 100) {
+        const l = lerp(i, 100, 1);
+        printLine(l);
+    }
+} else if (mode == "2") {
+    repeat {
+        printLine(inputLine());
+    }
+} else if (mode == "3") {
+    const i = 1;
+    while (i <= 10) {
+        printLine(i);
+    }
+} else {
+    printLine("そのモードは存在しません。終了します。");
+}

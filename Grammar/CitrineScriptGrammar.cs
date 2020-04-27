@@ -1,5 +1,6 @@
 
 using System;
+using Irony.Interpreter.Ast;
 using Irony.Parsing;
 
 namespace Citrine.Scripting
@@ -125,6 +126,7 @@ namespace Citrine.Scripting
 				exprAssignment |
 				numberLiteral |
 				stringLiteral |
+				identifier |
 				@object |
 				array |
 				"null" | "true" | "false";
@@ -218,17 +220,17 @@ namespace Citrine.Scripting
 
 			statementIf.Rule =
 				// if (expr) statement
-				"if" + "(" + expression + ")" + statementCanBeChild |
+				ToTerm("if") + "(" + expression + ")" + statementCanBeChild |
 				// if (expr) statement else statement
-				"if" + "(" + expression + ")" + statementCanBeChild + "else" + statementCanBeChild;
+				ToTerm("if") + "(" + expression + ")" + statementCanBeChild + "else" + statementCanBeChild;
 
 			statementFor.Rule =
 				// for (id in expr) statement
-				"for" + "(" + identifier + "in" + expression + ")" + statementCanBeChild;
+				ToTerm("for") + "(" + identifier + "in" + expression + ")" + statementCanBeChild;
 
 			statementWhile.Rule =
 				// while (expr) statement
-				"while" + "(" + expression + ")" + statementCanBeChild;
+				ToTerm("while") + "(" + expression + ")" + statementCanBeChild;
 
 			statementDoWhile.Rule =
 				// do statement while (expr);

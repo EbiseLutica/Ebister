@@ -1,0 +1,7 @@
+// 定義系
+var a = 4;
+const unchi = "💩";
+
+func getThinkingFace() {
+    return "🤔";
+}
