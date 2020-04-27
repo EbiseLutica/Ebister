@@ -239,8 +239,8 @@ namespace Citrine.Scripting
 				"repeat" + statementCanBeChild;
 
 			statementGroup.Rule =
-				// group { groupChildren } }
-				"group" + "{" + groupChildren + "}";
+				// group id { groupChildren }
+				"group" + identifier + "{" + groupChildren + "}";
 
 			groupChildren.Rule =
 				MakeStarRule(groupChildren,
