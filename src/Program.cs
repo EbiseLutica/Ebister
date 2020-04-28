@@ -20,14 +20,25 @@ namespace Citrine.Scripting
 			}
 			var source = File.ReadAllText(args[0]);
 			var parser = new Parser(new CitrineScriptGrammar());
-			var ast = parser.Parse(source);
 
-			ast.ParserMessages.ForEach(log =>
+			var tree = parser.Parse(source);
+
+			if (tree.HasErrors())
 			{
-				Console.WriteLine($"{log.Level.ToString().ToUpperInvariant()} {log.Location}: {log.Message}");
-			});
-			Console.WriteLine(ast.ToXml());
+				Console.Error.WriteLine("Interpreter Error!");
+				tree.ParserMessages.ForEach(log =>
+				{
+					Console.Error.WriteLine($"{log.Level.ToString().ToUpperInvariant()} {log.Location}: {log.Message}");
+				});
+				return -1;
+			}
+			Console.WriteLine(tree.ToXml());
 			return 0;
 		}
+	}
+
+	public class CitrineScript
+	{
+
 	}
 }

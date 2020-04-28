@@ -1,14 +1,14 @@
 
 using System;
-using Irony.Interpreter.Ast;
 using Irony.Parsing;
 
 namespace Citrine.Scripting
 {
+
 	[Language("CitrineScript", "1.0", "CitrineScript")]
 	public class CitrineScriptGrammar : Grammar
 	{
-		public CitrineScriptGrammar()
+		public CitrineScriptGrammar(bool generateAst = false)
 		{
 			var singleComment = new CommentTerminal("single_comment", "//", "\r", "\n", "\u2085", "\u2028", "\u2029");
 			var multilineComment = new CommentTerminal("multiline_comment", "/*", "*/");
@@ -18,10 +18,10 @@ namespace Citrine.Scripting
 			var numberLiteral = new NumberLiteral("number",
 				NumberOptions.AllowSign |
 				NumberOptions.AllowStartEndDot |
-				NumberOptions.AllowUnderscore |
-				NumberOptions.Binary |
-				NumberOptions.Hex
+				NumberOptions.AllowUnderscore
 			);
+			numberLiteral.AddPrefix("0x", NumberOptions.Hex);
+			numberLiteral.AddPrefix("0b", NumberOptions.Binary);
 
 			var stringLiteral = new StringLiteral("string", "\"", StringOptions.AllowsAllEscapes);
 			stringLiteral.AddPrefix("@", StringOptions.NoEscapes | StringOptions.AllowsLineBreak | StringOptions.AllowsDoubledQuote);
@@ -37,35 +37,45 @@ namespace Citrine.Scripting
 			var option = new NonTerminal("option");
 			var options = new NonTerminal("options");
 
-			var statementVar = new NonTerminal("statementVar");
-			var statementConst = new NonTerminal("statementConst");
-			var statementIf = new NonTerminal("statementIf");
-			var statementFor = new NonTerminal("statementFor");
-			var statementWhile = new NonTerminal("statementWhile");
-			var statementDoWhile = new NonTerminal("statementDoWhile");
-			var statementRepeat = new NonTerminal("statementRepeat");
-			var statementGroup = new NonTerminal("statementGroup");
-			var statementFunc = new NonTerminal("statementFunc");
-			var statementReturn = new NonTerminal("statementReturn");
-			var statementBreak = new NonTerminal("statementBreak");
-			var statementContinue = new NonTerminal("statementContinue");
+			var statementVar = new NonTerminal("statementVar", typeof(VarNode));
+			var statementConst = new NonTerminal("statementConst", typeof(ConstNode));
+			var statementIf = new NonTerminal("statementIf", typeof(IfNode));
+			var statementFor = new NonTerminal("statementFor", typeof(FuncNode));
+			var statementWhile = new NonTerminal("statementWhile", typeof(WhileNode));
+			var statementDoWhile = new NonTerminal("statementDoWhile", typeof(DoWhileNode));
+			var statementRepeat = new NonTerminal("statementRepeat", typeof(RepeatNode));
+			var statementGroup = new NonTerminal("statementGroup", typeof(GroupNode));
+			var statementFunc = new NonTerminal("statementFunc", typeof(FuncNode));
+			var statementReturn = new NonTerminal("statementReturn", typeof(ReturnNode));
+			var statementBreak = new NonTerminal("statementBreak", typeof(BreakNode));
+			var statementContinue = new NonTerminal("statementContinue", typeof(ContinueNode));
 
 			var groupChildren = new NonTerminal("groupChildren");
+			var groupChild = new NonTerminal("groupChild");
+
+			var preUnaryOps = new NonTerminal("preUnaryOps")
+			{
+				Rule = ToTerm("++") | "--" | "+" | "-" | "!"
+			};
+			var postUnaryOps = new NonTerminal("postUnaryOps")
+			{
+				Rule = ToTerm("++") | "--"
+			};
+			var binOps = new NonTerminal("binOps")
+			{
+				Rule = ToTerm("||") | "&&" | "^" | "|" | "&" | "==" | "!=" | "<=" | ">=" | "<" | ">" | "<<" | ">>" | "+" | "-" | "*" | "/" | "%"
+			};
+			var assignmentOps = new NonTerminal("assignmentOps")
+			{
+				Rule = ToTerm("=") | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>="
+			};
 
 			var exprAssignment = new NonTerminal("exprAssignment");
-			var exprCondition = new NonTerminal("exprLambda");
-			var exprOr2 = new NonTerminal("exprOr");
-			var exprAnd2 = new NonTerminal("exprAnd");
-			var exprXor = new NonTerminal("exprAnd");
-			var exprOr = new NonTerminal("exprAnd");
-			var exprAnd = new NonTerminal("exprAnd");
-			var exprComparision = new NonTerminal("exprComparision");
-			var exprShift = new NonTerminal("exprShift");
-			var exprAddSub = new NonTerminal("exprAddSub");
-			var exprMulDiv = new NonTerminal("exprMulDiv");
+			var exprCondition = new NonTerminal("exprCondition");
+			var exprBin = new NonTerminal("exprBin");
 			var exprRange = new NonTerminal("exprRange");
-			var exprPreUnary = new NonTerminal("exprUnary");
-			var exprPostUnary = new NonTerminal("exprPreIncDec");
+			var exprPreUnary = new NonTerminal("exprPreUnary");
+			var exprPostUnary = new NonTerminal("exprPostUnary");
 			var exprParen = new NonTerminal("exprParen");
 			var exprLambda = new NonTerminal("exprLambda");
 
@@ -122,8 +132,8 @@ namespace Citrine.Scripting
 				"{" + statements + "}";
 
 			expression.Rule =
-				exprParen |
 				exprAssignment |
+				exprLambda |
 				numberLiteral |
 				stringLiteral |
 				identifier |
@@ -137,52 +147,18 @@ namespace Citrine.Scripting
 
 			exprLambda.Rule =
 				// (params) => <expr | block>;
-				(("(" + identifiers + ")") | identifier) + "=>" + (expression | block);
+				"(" + identifiers + ")" + "=>" + (expression | block);
 
 			exprAssignment.Rule = exprCondition |
-				exprLambda |
 				// x = y  x += y  x -= y  x *= y  x /= y  x %= y  x &= y  x |= y  x ^= y  x <<= y  x >>= y
-				expression + (ToTerm("=") | "+=" | "-=" | "*=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=") + expression;
+				expression + assignmentOps + expression;
 
-			exprCondition.Rule = exprOr2 |
+			exprCondition.Rule = exprBin |
 				// c ? t : f
 				expression + "?" + expression + ":" + expression;
 
-			exprOr2.Rule = exprAnd2 |
-				// x || y
-				expression + "||" + expression;
-
-			exprAnd2.Rule = exprXor |
-				// x && y
-				expression + "&&" + expression;
-
-			exprXor.Rule = exprOr |
-				// x ^ y
-				expression + "^" + expression;
-
-			exprOr.Rule = exprAnd |
-				// x | y
-				expression + "|" + expression;
-
-			exprAnd.Rule = exprComparision |
-				// x & y
-				expression + "&" + expression;
-
-			exprComparision.Rule = exprShift |
-				// x == y  x != y  x <= y  x >= y  x < y  x > y
-				expression + (ToTerm("==") | "!=" | "<=" | ">=" | "<" | ">") + expression;
-
-			exprShift.Rule = exprAddSub |
-				// x << y  x >> y
-				expression + (ToTerm("<<") | ">>") + expression;
-
-			exprAddSub.Rule = exprMulDiv |
-				// x + y  x - y
-				expression + (ToTerm("+") | "-") + expression;
-
-			exprMulDiv.Rule = exprRange |
-				// x * y  x / y  x % y
-				expression + (ToTerm("*") | "/" | "%") + expression;
+			exprBin.Rule = exprRange |
+				expression + binOps + expression;
 
 			exprRange.Rule = exprPreUnary |
 				// f -> t
@@ -192,11 +168,11 @@ namespace Citrine.Scripting
 
 			exprPreUnary.Rule = exprPostUnary |
 				// ++x --x +x -x !x
-				(ToTerm("++") | "--" | "+" | "-" | "!") + expression;
+				preUnaryOps + expression;
 
-			exprPostUnary.Rule =
+			exprPostUnary.Rule = exprParen |
 				// x++ x--
-				expression + (ToTerm("++") | ToTerm("--")) |
+				expression + postUnaryOps |
 				// x.y
 				expression + "." + identifier |
 				// x[y]
@@ -212,7 +188,8 @@ namespace Citrine.Scripting
 
 			statementVar.Rule =
 				// const id = expr;
-				"var" + identifier + "=" + expression + ";";
+				"var" + identifier + "=" + expression + ";" |
+				"var" + identifier + ";";
 
 			statementConst.Rule =
 				// const id = expr;
@@ -245,9 +222,10 @@ namespace Citrine.Scripting
 				"group" + identifier + "{" + groupChildren + "}";
 
 			groupChildren.Rule =
-				MakeStarRule(groupChildren,
-					statementVar | statementConst | statementFunc
-				);
+				MakeStarRule(groupChildren, groupChild);
+
+			groupChild.Rule =
+				statementVar | statementConst | statementFunc;
 
 			statementFunc.Rule =
 				// func id(identifiers) { statements }
@@ -266,10 +244,42 @@ namespace Citrine.Scripting
 				// break;
 				ToTerm("continue") + ";";
 
-			Root = new NonTerminal("program")
+			Root = new NonTerminal("program", typeof(ProgramNode))
 			{
 				Rule = options + statements
 			};
+
+			RegisterOperators(1, Associativity.Right, "=", "+=", "-=", "*=", "/=", "&=", "|=", "^=", "<<=", ">>=");
+			RegisterOperators(2, "||");
+			RegisterOperators(3, "&&");
+			RegisterOperators(4, "^");
+			RegisterOperators(5, "|");
+			RegisterOperators(6, "&");
+			RegisterOperators(7, "==", "!=", "<=", ">=", "<", ">");
+			RegisterOperators(8, "<<", ">>");
+			RegisterOperators(9, "+", "-");
+			RegisterOperators(10, "*", "/", "%");
+
+			MarkReservedWords("var", "const", "if", "else", "func", "group", "for", "in", "while", "do", "repeat", "break", "continue", "return", "option", "strict");
+			MarkPunctuation("{", "}", ",", ";", ":", "[", "]", "(", ")", "var", "const", "if", "else", "func", "group", "for", "in", "while", "do", "repeat", "break", "continue", "return", "option");
+			RegisterBracePair("(", ")");
+			RegisterBracePair("[", "]");
+			RegisterBracePair("{", "}");
+			MarkTransient(
+				statementCanBeChild,
+				groupChild,
+				expression,
+				statement,
+				assignmentOps,
+				binOps,
+				preUnaryOps,
+				postUnaryOps,
+				option
+			);
+
+			LanguageFlags = LanguageFlags.NewLineBeforeEOF;
+			if (generateAst)
+				LanguageFlags |= LanguageFlags.CreateAst;
 		}
 	}
 }

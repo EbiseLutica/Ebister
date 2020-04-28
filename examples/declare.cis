@@ -1,7 +1,9 @@
 // 定義系
-var a = 4;
+var a = (4 + 2) * 5 / 3;
+/*
 const unchi = "💩";
 
 func getThinkingFace() {
     return "🤔";
 }
+*/

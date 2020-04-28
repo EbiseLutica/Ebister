@@ -1,4 +1,5 @@
 // CitrineScript sample code
+option strict;
 
 group Math {
     func lerp(time, start, end) {
