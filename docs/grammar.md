@@ -1,6 +1,6 @@
 # 構文
 
-CitrineScript の構文ドキュメント。
+Ebister の構文ドキュメント。
 
 
 ## コメント
@@ -54,7 +54,7 @@ CitrineScript の構文ドキュメント。
 
 ### 数値
 
-CitrineScript では全ての数値は実数である。
+Ebister では全ての数値は実数である。
 
 ```cs
 3

@@ -1,8 +1,8 @@
-# CitrineScript ドキュメント
+# Ebister ドキュメント
 
 ## 拡張子
 
-CitrineScriptの拡張子は、.cis とする。
+Ebister で書かれたソースコードの拡張子は、.ebi とする。
 
 ## その他
 

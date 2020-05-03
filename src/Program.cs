@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Irony.Parsing;
+using Ebister.Parsing;
 
-namespace Citrine.Scripting
+namespace Ebister
 {
 	class Program
 	{
@@ -19,26 +19,28 @@ namespace Citrine.Scripting
 				return -2;
 			}
 			var source = File.ReadAllText(args[0]);
-			var parser = new Parser(new CitrineScriptGrammar());
 
-			var tree = parser.Parse(source);
+			var runtime = new Ebister();
 
-			if (tree.HasErrors())
+			try
 			{
-				Console.Error.WriteLine("Interpreter Error!");
-				tree.ParserMessages.ForEach(log =>
+				runtime.Evaluate(source);
+			}
+			catch (SyntaxErrorException err)
+			{
+				err.Log.ForEach(log =>
 				{
 					Console.Error.WriteLine($"{log.Level.ToString().ToUpperInvariant()} {log.Location}: {log.Message}");
 				});
 				return -1;
 			}
-			Console.WriteLine(tree.ToXml());
+			catch (RuntimeException err)
+			{
+				Console.WriteLine("Runtime error! " + err.Message);
+				return -1;
+			}
+
 			return 0;
 		}
-	}
-
-	public class CitrineScript
-	{
-
 	}
 }

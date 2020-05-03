@@ -2,13 +2,12 @@
 using System;
 using Irony.Parsing;
 
-namespace Citrine.Scripting
+namespace Ebister.Parsing
 {
-
-	[Language("CitrineScript", "1.0", "CitrineScript")]
-	public class CitrineScriptGrammar : Grammar
+	[Language("Ebister", "1.0", "Ebister")]
+	public class EbisterGrammar : Grammar
 	{
-		public CitrineScriptGrammar(bool generateAst = false)
+		public EbisterGrammar(bool generateAst = false)
 		{
 			var singleComment = new CommentTerminal("single_comment", "//", "\r", "\n", "\u2085", "\u2028", "\u2029");
 			var multilineComment = new CommentTerminal("multiline_comment", "/*", "*/");
@@ -37,18 +36,18 @@ namespace Citrine.Scripting
 			var option = new NonTerminal("option");
 			var options = new NonTerminal("options");
 
-			var statementVar = new NonTerminal("statementVar", typeof(VarNode));
-			var statementConst = new NonTerminal("statementConst", typeof(ConstNode));
-			var statementIf = new NonTerminal("statementIf", typeof(IfNode));
-			var statementFor = new NonTerminal("statementFor", typeof(FuncNode));
-			var statementWhile = new NonTerminal("statementWhile", typeof(WhileNode));
-			var statementDoWhile = new NonTerminal("statementDoWhile", typeof(DoWhileNode));
-			var statementRepeat = new NonTerminal("statementRepeat", typeof(RepeatNode));
-			var statementGroup = new NonTerminal("statementGroup", typeof(GroupNode));
-			var statementFunc = new NonTerminal("statementFunc", typeof(FuncNode));
-			var statementReturn = new NonTerminal("statementReturn", typeof(ReturnNode));
-			var statementBreak = new NonTerminal("statementBreak", typeof(BreakNode));
-			var statementContinue = new NonTerminal("statementContinue", typeof(ContinueNode));
+			var statementVar = new NonTerminal("var");
+			var statementConst = new NonTerminal("const");
+			var statementIf = new NonTerminal("if");
+			var statementFor = new NonTerminal("for");
+			var statementWhile = new NonTerminal("while");
+			var statementDoWhile = new NonTerminal("do-while");
+			var statementRepeat = new NonTerminal("repeat");
+			var statementGroup = new NonTerminal("group");
+			var statementFunc = new NonTerminal("func");
+			var statementReturn = new NonTerminal("return");
+			var statementBreak = new NonTerminal("break");
+			var statementContinue = new NonTerminal("continue");
 
 			var groupChildren = new NonTerminal("groupChildren");
 			var groupChild = new NonTerminal("groupChild");
@@ -244,7 +243,7 @@ namespace Citrine.Scripting
 				// break;
 				ToTerm("continue") + ";";
 
-			Root = new NonTerminal("program", typeof(ProgramNode))
+			Root = new NonTerminal("program")
 			{
 				Rule = options + statements
 			};

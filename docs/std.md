@@ -5,7 +5,7 @@
 グローバル空間にある関数群です。
 
 ### version
-この CitrineScript のバージョンを返します。
+この Ebister 言語のバージョンを返します。
 
 ### print(value)
 `value` を出力します。
@@ -21,22 +21,10 @@
 
 ### isDefined(name)
 `name` という名前の変数、定数、関数が定義されていれば `true` 、いなければ `false` を返します。
-`"Math.pi"` のようにグループ名も指定できます。
 
-### isDefinedVar(variableName)
-`variableName` という名前の変数が定義されていれば `true` 、いなければ `false` を返します。
-`"Math.pi"` のようにグループ名も指定することでグループ変数もチェックできます。
+### isDefined(objectOrGroup, name)
 
-### isDefinedConst(constName)
-`constName` という名前の定数が定義されていれば `true` 、いなければ `false` を返します。
-`"Math.pi"` のようにグループ名も指定することでグループ定数もチェックできます。
-
-### isDefinedFunction(funcName)
-`funcName` という名前の関数が定義されていれば `true`、いなければ `false` を返します。
-`"Math.sin"` のようにグループ名も指定することでグループ関数もチェックできます。
-
-### isDefinedGroup(groupName)
-`groupName` という名前のグループが定義されていれば `true`、いなければ `false` を返します。
+`objectOrGroup` にオブジェクト、またはグループを指定し、 `name` という名前の変数、定数、関数が定義されていれば `true` 、いなければ `false` を返します。
 
 ### typeof(value)
 `value` の型を文字列形式で返します。取りうる値は以下のとおりです
@@ -45,6 +33,7 @@
 - `"boolean"`
 - `"array"`
 - `"function"`
+- `"group"`
 - `"object"`
 - `"null"`
 
@@ -52,7 +41,7 @@
 `value` を数値に変換します。変換できる型は以下の通りです
 
 - 文字列型
-    - CitrineScript で取り扱う数値として正しく解釈できる文字列でない場合、NaNを返します
+    - Ebister の数値フォーマットとして正しく解釈できる文字列でない場合、NaNを返します
 - boolean 型
     - true → 1, false → 0
 - null → 0

@@ -1,7 +1,11 @@
-# CitrineScript
+# Ebister
 
-CitrineScript は、Bot [Citrine](https://github.com/Xeltica/Citrine) で動作することを目的とした小さなスクリプト言語。
-とはいえ、Bot 特有の機能には一切依存しないため、.NET で動作するスクリプト言語として使える。
+Ebister は、.NET Standard で動作する軽量なスクリプト言語です。
+
+- セキュリティに影響を及ぼさないよう限定した標準ライブラリ
+- C# メソッドや定数をランタイムに注入し、スクリプトから使用可能
+- C, JS, C# に似た言語仕様
+- 手軽な手続き型パラダイム
 
 [文法についてはこちらのドキュメントを参照](docs/index.md)
 
