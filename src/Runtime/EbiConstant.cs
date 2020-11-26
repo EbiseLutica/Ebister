@@ -29,8 +29,7 @@ namespace Ebister
 
 		protected bool IsValidType(EbiValueBase value)
 		{
-			// TODO: キャストとかをやる
-			return value.Type == SuitableType;
+			return EbiTypeHelper.IsValidType(value.Type, SuitableType);
 		}
 
 		private EbiValueBase _value;

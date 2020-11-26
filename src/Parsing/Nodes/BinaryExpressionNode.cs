@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Irony.Ast;
 using Irony.Interpreter;
@@ -26,7 +27,7 @@ namespace Ebister.Parsing.Node
 				var e = children[0].Term switch
 				{
 					KeyTerm key => key.Text == "true" ? true : key.Text == "false" ? false : key.Text == "null" ? null : throw new ParserException("Invalid"),
-					IdentifierTerminal id => throw new ParserException($"No such identifier named '{id.Name}'"),
+					IdentifierTerminal => new IdentifierNode(children[0].AsString),
 					_ => children[0].Evaluate(thread),
 				};
 				thread.CurrentNode = Parent;

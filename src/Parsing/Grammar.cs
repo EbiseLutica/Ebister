@@ -46,12 +46,15 @@ namespace Ebister.Parsing
 			var exprAddSub = new NonTerminal("exprAddSub", typeof(IronyExpressionNode));
 			var exprMulDiv = new NonTerminal("exprMulDiv", typeof(IronyExpressionNode));
 			var expr = new NonTerminal("expr", typeof(IronyExpressionNode));
+			var exprs = new NonTerminal("exprs", typeof(IronyExpressionsNode));
 			var exprParen = new NonTerminal("exprParen", typeof(IronyParenExpressionNode));
 			var exprUnary = new NonTerminal("exprUnary", typeof(IronyUnaryExpressionNode));
+			var exprCall = new NonTerminal("call", typeof(IronyCallExpressionNode));
 			var operatorUnary = new NonTerminal("operatorUnary", typeof(IronyUnaryOperatorNode));
 
 			// 3. BNF Definition
 			program.Rule = MakeStarRule(program, statement);
+			exprs.Rule = MakeStarRule(exprs, ToTerm(","), exprAddSub);
 			statement.Rule = exprAddSub + operatorSemicolon;
 			exprAddSub.Rule = exprMulDiv
 				| exprAddSub + operatorPlus + exprAddSub
@@ -60,8 +63,11 @@ namespace Ebister.Parsing
 				| exprMulDiv + operatorAsterisk + exprMulDiv
 				| exprMulDiv + operatorSlash + exprMulDiv
 				| exprMulDiv + operatorPercent + exprMulDiv;
+			exprCall.Rule =
+				expr + operatorParenLeft + exprs + operatorParenRight;
 			expr.Rule = exprParen
 				| exprUnary
+				| exprCall
 				| literalNumber
 				| literalString
 				| "true"

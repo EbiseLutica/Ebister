@@ -24,15 +24,17 @@ var runtime = new EbiRuntime();
 Console.WriteLine("Ebister REPL v1.0.0");
 Console.WriteLine("READY");
 
+object? result = null;
+
 while (true)
 {
-	Console.Write("> ");
+	Console.Write(result != null ? "(" + result + ") > " : "> ");
 	var s = Console.ReadLine();
 	if (s == null) break;
 
 	try
 	{
-		Console.WriteLine(runtime.Run(s));
+		result = runtime.Run(s);
 	}
 	catch (ParserException e)
 	{
