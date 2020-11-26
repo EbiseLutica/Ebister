@@ -16,7 +16,7 @@ namespace Ebister
 			}
 			catch (ScriptException e)
 			{
-				throw new ParserException(e.Message, e);
+				throw new ParserException(e.Message + e.Location, e);
 			}
 		}
 

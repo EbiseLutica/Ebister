@@ -7,19 +7,32 @@ using Irony.Interpreter;
 using Irony.Parsing;
 
 
-// if (args.Length == 0)
-// {
-// 	Console.Error.WriteLine("Specify source file");
-// 	return -1;
-// }
-// if (!File.Exists(args[0]))
-// {
-// 	Console.Error.WriteLine("No such file");
-// 	return -2;
-// }
-// var source = File.ReadAllText(args[0]);
-
 var runtime = new EbiRuntime();
+
+if (args.Length == 1)
+{
+	if (!File.Exists(args[0]))
+	{
+		Console.Error.WriteLine("No such file");
+		return -2;
+	}
+	var source = File.ReadAllText(args[0]);
+	try
+	{
+		runtime.Run(source);
+	}
+	catch (ParserException e)
+	{
+		Console.Error.WriteLine(e.Message);
+		return -1;
+	}
+	catch (RuntimeException e)
+	{
+		Console.Error.WriteLine(e.Message);
+		return -3;
+	}
+	return 0;
+}
 
 Console.WriteLine("Ebister REPL v1.0.0");
 Console.WriteLine("READY");
