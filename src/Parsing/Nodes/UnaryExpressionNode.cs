@@ -22,7 +22,7 @@ namespace Ebister.Parsing.Node
 			thread.CurrentNode = this;
 
 			if (unaryOperatorNode?.Evaluate(thread) is not string op) throw new ParserException("invalid unary operator");
-			if (terminalNode?.Evaluate(thread) is not EbisterNode term) throw new ParserException("invalid terminal");
+			if (terminalNode?.Evaluate(thread) is not ExpressionNode term) throw new ParserException("invalid terminal");
 
 			return new UnaryExpressionNode(op, term);
 		}
@@ -35,9 +35,9 @@ namespace Ebister.Parsing.Node
 	public class UnaryExpressionNode : ExpressionNode
 	{
 		public string Operator { get; }
-		public EbisterNode Terminal { get; }
+		public ExpressionNode Terminal { get; }
 
-		public UnaryExpressionNode(string op, EbisterNode terminal) => (Operator, Terminal) = (op, terminal);
+		public UnaryExpressionNode(string op, ExpressionNode terminal) => (Operator, Terminal) = (op, terminal);
 
 		public override string ToString() => $"({Operator} {Terminal})";
 	}

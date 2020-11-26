@@ -18,7 +18,7 @@ namespace Ebister.Parsing.Node
 		{
 			thread.CurrentNode = this;
 
-			if (expression?.Evaluate(thread) is not EbisterNode expr) throw new ParserException("invalid terminal");
+			if (expression?.Evaluate(thread) is not ExpressionNode expr) throw new ParserException("invalid terminal");
 
 			thread.CurrentNode = Parent;
 			return expr;

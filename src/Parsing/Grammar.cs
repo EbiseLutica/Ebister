@@ -15,8 +15,21 @@ namespace Ebister.Parsing
 			NonGrammarTerminals.Add(commentSingleLine);
 			NonGrammarTerminals.Add(commentMultiLine);
 
-			// 1. Numerics
-			var literalNumber = new NumberLiteral("number");
+			// 1. Literals and Operators
+
+			var literalNumber = new NumberLiteral("number",
+				NumberOptions.AllowSign |
+				NumberOptions.AllowStartEndDot |
+				NumberOptions.AllowUnderscore
+			);
+			literalNumber.AddPrefix("0x", NumberOptions.Hex);
+			literalNumber.AddPrefix("0b", NumberOptions.Binary);
+
+			var literalString = new StringLiteral("string", "\"", StringOptions.AllowsAllEscapes);
+			literalString.AddPrefix("@", StringOptions.NoEscapes | StringOptions.AllowsLineBreak | StringOptions.AllowsDoubledQuote);
+
+			var identifier = new IdentifierTerminal("identifier");
+
 			var operatorPlus = ToTerm("+");
 			var operatorMinus = ToTerm("-");
 			var operatorAsterisk = ToTerm("*");
@@ -49,7 +62,12 @@ namespace Ebister.Parsing
 				| exprMulDiv + operatorPercent + exprMulDiv;
 			expr.Rule = exprParen
 				| exprUnary
-				| literalNumber;
+				| literalNumber
+				| literalString
+				| "true"
+				| "false"
+				| "null"
+				| identifier;
 			exprParen.Rule = operatorParenLeft + exprAddSub + operatorParenRight;
 			exprUnary.Rule = operatorUnary + expr;
 			operatorUnary.Rule = operatorPlus | operatorMinus;

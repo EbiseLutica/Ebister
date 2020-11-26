@@ -7,8 +7,8 @@ namespace Ebister.Parsing.Node
 {
 	public class LiteralNode : ExpressionNode
 	{
-		public object Value { get; }
-		public LiteralNode(object value) => Value = value;
+		public EbiValueBase Value { get; }
+		public LiteralNode(EbiValueBase value) => Value = value;
 
 		public override string ToString() => Value.ToString() ?? "null";
 	}

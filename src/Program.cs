@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Ebister;
 using Ebister.Parsing;
 using Ebister.Parsing.Node;
 using Irony.Interpreter;
@@ -18,8 +19,7 @@ using Irony.Parsing;
 // }
 // var source = File.ReadAllText(args[0]);
 
-var lang = new LanguageData(new EbisterGrammar());
-var app = new ScriptApp(lang);
+var runtime = new EbiRuntime();
 
 Console.WriteLine("Ebister REPL v1.0.0");
 Console.WriteLine("READY");
@@ -32,15 +32,15 @@ while (true)
 
 	try
 	{
-		var ast = app.Evaluate(s);
-
-		if (ast is not ProgramNode prg) throw new Exception("not ProgramNode");
-
-		Console.WriteLine(prg);
+		Console.WriteLine(runtime.Run(s));
 	}
-	catch (ScriptException e)
+	catch (ParserException e)
 	{
-		Console.Error.WriteLine($"Syntax Error: {e.Location}");
+		Console.Error.WriteLine(e.Message);
+	}
+	catch (RuntimeException e)
+	{
+		Console.Error.WriteLine(e.Message);
 	}
 }
 

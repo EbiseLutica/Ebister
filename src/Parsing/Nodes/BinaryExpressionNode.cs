@@ -23,17 +23,22 @@ namespace Ebister.Parsing.Node
 
 			if (children.Length == 1)
 			{
-				var e = children[0].Evaluate(thread);
+				var e = children[0].Term switch
+				{
+					KeyTerm key => key.Text == "true" ? true : key.Text == "false" ? false : key.Text == "null" ? null : throw new ParserException("Invalid"),
+					IdentifierTerminal id => throw new ParserException($"No such identifier named '{id.Name}'"),
+					_ => children[0].Evaluate(thread),
+				};
 				thread.CurrentNode = Parent;
 
 				// EbisterNodeでなければおそらくリテラルの即値（としておく）
-				return e is EbisterNode node ? node : new LiteralNode(e);
+				return e is EbisterNode node ? node : new LiteralNode(EbiValueBase.ToEbiObject(e));
 			}
 			else if (children.Length == 3)
 			{
-				if (children[0]?.Evaluate(thread) is not EbisterNode left) throw new ParserException();
+				if (children[0]?.Evaluate(thread) is not ExpressionNode left) throw new ParserException();
 				if (children[1].Term is not KeyTerm t) throw new ParserException();
-				if (children[2]?.Evaluate(thread) is not EbisterNode right) throw new ParserException();
+				if (children[2]?.Evaluate(thread) is not ExpressionNode right) throw new ParserException();
 				thread.CurrentNode = Parent;
 				return new BinaryExpressionNode(t.Text, left, right);
 			}
@@ -49,10 +54,10 @@ namespace Ebister.Parsing.Node
 	public class BinaryExpressionNode : ExpressionNode
 	{
 		public string Operator { get; }
-		public EbisterNode TerminalLeft { get; }
-		public EbisterNode TerminalRight { get; }
+		public ExpressionNode TerminalLeft { get; }
+		public ExpressionNode TerminalRight { get; }
 
-		public BinaryExpressionNode(string op, EbisterNode left, EbisterNode right) => (Operator, TerminalLeft, TerminalRight) = (op, left, right);
+		public BinaryExpressionNode(string op, ExpressionNode left, ExpressionNode right) => (Operator, TerminalLeft, TerminalRight) = (op, left, right);
 
 		public override string ToString() => $"({Operator} {TerminalLeft} {TerminalRight})";
 	}
