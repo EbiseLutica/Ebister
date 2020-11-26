@@ -12,11 +12,4 @@ namespace Ebister.Parsing.Node
 
 		public override string ToString() => Value.ToString() ?? "null";
 	}
-	public class IdentifierNode : ExpressionNode
-	{
-		public string Name { get; }
-		public IdentifierNode(string name) => Name = name;
-
-		public override string ToString() => $"(id {Name})";
-	}
 }
