@@ -12,33 +12,56 @@ namespace Ebister
 			configuration = conf ?? new RuntimeConfiguration();
 		}
 
-		public object? Run(string source)
+		public void Run(string source)
 		{
-			return Run(EbiParser.Parse(source));
+			Run(EbiParser.Parse(source));
 		}
 
-		public EbiValueBase Run(ProgramNode program)
+		public void Run(ProgramNode program)
 		{
 			if (!configuration.PersistContext)
 				globalScope = EbiScope.CreateGlobalScope();
-			EbiValueBase lastEvaluatedStatement = new EbiNull();
 
-			var currentScope = globalScope;
-
-			foreach (var (node, i) in program.Nodes.Select((node, i) => (node, i)))
-			{
-				lastEvaluatedStatement = Evaluate(currentScope, node);
-			}
-
-			return lastEvaluatedStatement;
+			Run(program, globalScope);
 		}
 
-		private EbiValueBase Evaluate(EbiScope scope, StatementNode statement)
+		private void Run(ProgramNode program, EbiScope scope)
 		{
-			return statement switch
+			foreach (var (node, i) in program.Nodes.Select((node, i) => (node, i)))
 			{
-				ExpressionStatementNode expr => Evaluate(scope, expr.Expression),
-				_ => new EbiNull(),
+				Evaluate(scope, node);
+			}
+		}
+
+		private void Evaluate(EbiScope scope, StatementNode statement)
+		{
+			switch (statement)
+			{
+				case ExpressionStatementNode expr:
+					Evaluate(scope, expr.Expression);
+					break;
+				case BlockStatementNode block:
+					Run(block.Statements, new EbiScope(scope));
+					break;
+				case RepeatStatementNode repeat:
+					try
+					{
+						while (true)
+						{
+							Evaluate(scope, repeat.Statement);
+						}
+					}
+					catch (BreakException) { }
+					catch (ContinueException)
+					{
+						// TODO: ここだけじゃないけど、現在の実装だとあっという間にstackoverflowになってしまうので実装法を考え直したい
+						Evaluate(scope, repeat);
+					}
+					break;
+				case BreakStatementNode:
+					throw new BreakException();
+				case ContinueStatementNode:
+					throw new ContinueException();
 			};
 		}
 

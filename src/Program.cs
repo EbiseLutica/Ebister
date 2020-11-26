@@ -37,17 +37,15 @@ if (args.Length == 1)
 Console.WriteLine("Ebister REPL v1.0.0");
 Console.WriteLine("READY");
 
-object? result = null;
-
 while (true)
 {
-	Console.Write(result != null ? "(" + result + ") > " : "> ");
+	Console.Write("> ");
 	var s = Console.ReadLine();
 	if (s == null) break;
 
 	try
 	{
-		result = runtime.Run(s);
+		runtime.Run(s);
 	}
 	catch (ParserException e)
 	{

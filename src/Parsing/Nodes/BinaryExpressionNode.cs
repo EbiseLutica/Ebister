@@ -12,6 +12,4 @@ namespace Ebister.Parsing.Node
 
 		public override string ToString() => $"({Operator} {TerminalLeft} {TerminalRight})";
 	}
-
-
 }

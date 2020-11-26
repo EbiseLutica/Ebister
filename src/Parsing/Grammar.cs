@@ -40,9 +40,16 @@ namespace Ebister.Parsing
 			var operatorSemicolon = ToTerm(";");
 
 			// 2. Non-Terminals
-			var program = new NonTerminal("program", typeof(IronyProgramNode));
-			var statement = new NonTerminal("statement", typeof(IronyExpressionStatementNode));
 
+			// 2.1 Statements
+			var program = new NonTerminal("program", typeof(IronyProgramNode));
+			var statement = new NonTerminal("statement", typeof(IronyGroupedNode));
+			var statementBlock = new NonTerminal("statementBlock", typeof(IronyBlockStatementNode));
+			var statementExpression = new NonTerminal("statementBlock", typeof(IronyExpressionStatementNode));
+			var statementKeyword = new NonTerminal("statementKeyword", typeof(IronyKeywordStatementNode));
+			var statementRepeat = new NonTerminal("statementRepeat", typeof(IronyRepeatStatementNode));
+
+			// 2.2 Expressions
 			var exprAddSub = new NonTerminal("exprAddSub", typeof(IronyExpressionNode));
 			var exprMulDiv = new NonTerminal("exprMulDiv", typeof(IronyExpressionNode));
 			var expr = new NonTerminal("expr", typeof(IronyExpressionNode));
@@ -55,7 +62,16 @@ namespace Ebister.Parsing
 			// 3. BNF Definition
 			program.Rule = MakeStarRule(program, statement);
 			exprs.Rule = MakeStarRule(exprs, ToTerm(","), exprAddSub);
-			statement.Rule = exprAddSub + operatorSemicolon;
+			statementExpression.Rule = exprAddSub + operatorSemicolon;
+			statementBlock.Rule = ToTerm("{") + program + ToTerm("}");
+			statementKeyword.Rule = "break" + operatorSemicolon
+				| "continue" + operatorSemicolon
+				| "return" + operatorSemicolon;
+			statementRepeat.Rule = "repeat" + statement;
+			statement.Rule = statementExpression
+				| statementBlock
+				| statementKeyword
+				| statementRepeat;
 			exprAddSub.Rule = exprMulDiv
 				| exprAddSub + operatorPlus + exprAddSub
 				| exprAddSub + operatorMinus + exprAddSub;
