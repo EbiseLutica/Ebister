@@ -19,13 +19,6 @@
 ### inputNumber(prompt?)
 `prompt` を出力し、1行の入力を受け付け、それを数値に変換して返します。`prompt` が未指定の場合は何も出力しません。
 
-### isDefined(name)
-`name` という名前の変数、定数、関数が定義されていれば `true` 、いなければ `false` を返します。
-
-### isDefined(objectOrGroup, name)
-
-`objectOrGroup` にオブジェクト、またはグループを指定し、 `name` という名前の変数、定数、関数が定義されていれば `true` 、いなければ `false` を返します。
-
 ### typeof(value)
 `value` の型を文字列形式で返します。取りうる値は以下のとおりです
 - `"string"`
@@ -56,76 +49,76 @@ valueがnull, 空文字列, 0, 要素数0の配列, false のいずれかであ�
 ### len(value)
 value が文字列の場合は文字列の長さ、配列の場合は配列の長さ、それ以外の場合は0を返します。
 
-## Math グループ
-算術演算の関数群を提供するグループです。
+## Math 静的クラス
+算術演算の関数群を提供する静的クラスです。
 
-### floor(num)
+### Math.floor(num)
 num の小数部分を切り捨てて返します。
 
-### round(num)
+### Math.round(num)
 num の小数部分を四捨五入して返します。
 
-### ceil(num)
+### Math.ceil(num)
 num の小数部分を切り上げて返します。
 
-### abs(num)
+### Math.abs(num)
 num の絶対値を返します。
 
-### sign(num)
+### Math.sign(num)
 num が負数であれば-1, 正数であれば1、0であれば0を返します。
 
-### min(value...)
+### Math.min(value...)
 与えられた値のうち小さい方を返します。
 
-### max(value...)
+### Math.max(value...)
 与えられた値のうち最も大きいものを返します。
 
-### sin(rad)
+### Math.sin(rad)
 サインを求めます。単位はラジアンです。
 
-### cos(rad)
+### Math.cos(rad)
 コサインを求めます。単位はラジアンです。
 
-### tan(rad)
+### Math.tan(rad)
 タンジェントを求めます。単位はラジアンです。
 
-### asin(num)
+### Math.asin(num)
 アークサインを求めます。
 
-### acos(num)
+### Math.acos(num)
 アークコサインを求めます。
 
-### atan(num)
+### Math.atan(num)
 アークタンジェントを求めます。
 
-### atan(x, y)
+### Math.atan(x, y)
 x, y座標からアークタンジェントを求めます。
 
-### sinh(num)
+### Math.sinh(num)
 ハイパボリックサインを求めます。
 
-### cosh(num)
+### Math.cosh(num)
 ハイパボリックコサインを求めます。
 
-### tanh(num)
+### Math.tanh(num)
 ハイパボリックタンジェントを求めます。
 
-### randomize(seed)
+### Math.randomize(seed)
 乱数を初期化します。seedを指定した場合その値で初期化しますが、指定しない場合現在日時で初期化します。
 
-### rnd(max)
+### Math.rnd(max)
 `max` を最大値とする乱数を返します。
 
-### sqrt(n)
+### Math.sqrt(n)
 √nを求めます。
 
-### pow(n, r)
+### Math.pow(n, r)
 nのr乗を求めます。
 
-### pi
+### Math.PI
 円周率です。
 
-### e
+### Math.E
 自然対数です。
 
 
@@ -240,15 +233,15 @@ callbackは値を引数に取り、真偽値を返す関数です。
 ### distinct(arr)
 配列 arr の重複する要素を取り除いた物を返します。
 
-## JSON グループ
+## JSON 静的クラス
 
-JSON グループは JSON との相互運用をサポートします。
+JSON との相互運用をサポートします。
 
-### stringify(obj, pretty?)
+### JSON.stringify(obj, pretty?)
 
 オブジェクトをJSON文字列に変換し、文字列形式で返します。pretty = true の場合、綺麗に整形します。
 
-### parse(str)
+### JSON.parse(str)
 
 JSON 文字列をオブジェクトにパースし返します。正しいJSON文字列でなければエラーとなります。
 
